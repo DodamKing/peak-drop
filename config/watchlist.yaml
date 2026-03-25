@@ -11,6 +11,10 @@ symbols:
     name: 삼성전자
     market: KR
     peak_type: auto_52w
+  - symbol: "005385"
+    name: 현대차우
+    market: KR
+    peak_type: auto_52w
 
 settings:
   report_title: "Peak-Drop Daily Report"

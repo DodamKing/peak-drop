@@ -1,20 +1,5 @@
 def analyze(stock_data: dict, peak_type: str, peak_price: float | None = None) -> dict:
-    """고점 대비 하락률을 계산한다.
-
-    Args:
-        stock_data: fetcher에서 반환된 데이터
-        peak_type: "manual" 또는 "auto_52w"
-        peak_price: manual일 때 기준 고점
-
-    Returns:
-        {
-            "symbol": str,
-            "current_price": float,
-            "peak_price": float,
-            "drawdown": float,  # 퍼센트 (음수)
-            "is_new_high": bool,
-        }
-    """
+    """고점 대비 하락률을 계산한다."""
     current = stock_data["current_price"]
 
     if peak_type == "manual":
@@ -31,4 +16,5 @@ def analyze(stock_data: dict, peak_type: str, peak_price: float | None = None) -
         "peak_price": peak,
         "drawdown": round(drawdown, 2),
         "is_new_high": is_new_high,
+        "daily_change": stock_data.get("daily_change", 0.0),
     }
