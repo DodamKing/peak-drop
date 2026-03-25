@@ -1,0 +1,16 @@
+symbols:
+  - symbol: QQQ
+    name: Invesco QQQ
+    market: US
+    peak_type: auto_52w
+  - symbol: NVDA
+    name: NVIDIA
+    market: US
+    peak_type: auto_52w
+  - symbol: "005930"
+    name: 삼성전자
+    market: KR
+    peak_type: auto_52w
+
+settings:
+  report_title: "Peak-Drop Daily Report"

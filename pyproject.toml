@@ -1,0 +1,16 @@
+[project]
+name = "peak-drop"
+version = "0.1.0"
+description = "주식 고점 대비 하락률 알림 봇"
+requires-python = ">=3.11"
+dependencies = [
+    "finance-datareader",
+    "requests",
+    "pyyaml",
+    "python-dotenv",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+]
