@@ -66,9 +66,9 @@ def format_embed(
         daily_str = _daily_change_str(r["daily_change"])
 
         if r["is_new_high"]:
-            value = f"종가: {current_str} | 고점: {peak_str}\n🎉 신고가 갱신! | 전일비: {daily_str}"
+            value = f"전일 종가: {current_str} | 고점: {peak_str}\n🎉 신고가 갱신! | 전일비: {daily_str}"
         else:
-            value = f"종가: {current_str} | 고점: {peak_str}\n{emoji} 하락률: {r['drawdown']}% | 전일비: {daily_str}"
+            value = f"전일 종가: {current_str} | 고점: {peak_str}\n{emoji} Drawdown: {r['drawdown']}% | 전일비: {daily_str}"
 
         fields.append({"name": display, "value": value, "inline": False})
 

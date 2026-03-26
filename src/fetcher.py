@@ -30,6 +30,14 @@ def fetch_stock_data(symbol: str, market: str) -> dict:
         if df is None or df.empty:
             return {"symbol": symbol, "error": "데이터 조회 결과 없음"}
 
+        # 오늘 날짜의 불완전 데이터 제거 + 중복 날짜 제거
+        today_str = end.strftime("%Y-%m-%d")
+        df = df[df.index.strftime("%Y-%m-%d") < today_str]
+        df = df[~df.index.duplicated(keep="last")]
+
+        if df.empty:
+            return {"symbol": symbol, "error": "데이터 조회 결과 없음"}
+
         current_price = float(df["Close"].iloc[-1])
         high_52w = float(df["Close"].max())
 
