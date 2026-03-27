@@ -242,6 +242,14 @@ NVIDIA (NVDA)
 - [ ] 거래량 정보 추가
 - [ ] yfinance fallback 검토 (FDR 장애 대비)
 
+### 2.5단계 (인프라 개선) ✅
+- [x] Supabase pg_cron으로 GitHub Actions 정시 트리거 (2026-03-27)
+  - GitHub Actions cron 큐 지연 문제 해결 (KST 10시 → 오후 1시+ 지연됨)
+  - Supabase 프로젝트: dev (Seoul 리전)
+  - pg_cron (`0 1 * * 1-5`) → pg_net으로 GitHub API `workflow_dispatch` 호출
+  - Supabase SQL에서 cron job 관리: `SELECT * FROM cron.job;`
+  - 토큰/시크릿 정보: [docs/secrets.md](secrets.md) 참고
+
 ### 3단계 (고도화)
 - [ ] Supabase 연동 (알림 이력 저장)
 - [ ] 웹 UI로 종목 관리
