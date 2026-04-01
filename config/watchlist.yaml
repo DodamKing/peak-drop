@@ -15,6 +15,10 @@ symbols:
     name: 현대차우
     market: KR
     peak_type: auto_52w
+  - symbol: SCHD
+    name: Schwab US Dividend Equity
+    market: US
+    peak_type: auto_52w
 
 settings:
   report_title: "Peak-Drop Daily Report"
