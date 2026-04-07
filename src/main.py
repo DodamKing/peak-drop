@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from src.fetcher import fetch_stock_data
 from src.analyzer import analyze
-from src.formatter import format_embed
+from src.formatter import format_embeds
 from src.notifier import send_discord, send_discord_embed
 
 load_dotenv()
@@ -39,23 +39,24 @@ def run():
         result["name"] = item.get("name", item["symbol"])
         results.append(result)
 
-    embed = format_embed(results, errors, symbols, title)
+    embeds = format_embeds(results, errors, symbols, title)
     print(f"종목 {len(results)}개 조회 완료, 에러 {len(errors)}개")
 
     if not webhook_url:
         print("\n[WARN] DISCORD_WEBHOOK_URL이 설정되지 않아 전송을 건너뜁니다.")
         return
 
-    try:
-        send_discord_embed(webhook_url, embed)
-        print("[OK] 디스코드 전송 완료")
-    except Exception as e:
-        error_msg = f"⚠️ Peak-Drop 전송 실패: {e}"
-        print(f"[ERROR] {error_msg}")
+    for embed in embeds:
         try:
-            send_discord(webhook_url, error_msg)
-        except Exception:
-            pass
+            send_discord_embed(webhook_url, embed)
+            print("[OK] 디스코드 전송 완료")
+        except Exception as e:
+            error_msg = f"[WARN] Peak-Drop 전송 실패: {e}"
+            print(f"[ERROR] {error_msg}")
+            try:
+                send_discord(webhook_url, error_msg)
+            except Exception:
+                pass
 
 
 if __name__ == "__main__":
@@ -66,7 +67,7 @@ if __name__ == "__main__":
         webhook_url = os.environ.get("DISCORD_WEBHOOK_URL", "")
         if webhook_url:
             try:
-                send_discord(webhook_url, f"⚠️ Peak-Drop 스크립트 오류: {e}")
+                send_discord(webhook_url, f"[ERROR] Peak-Drop 스크립트 오류: {e}")
             except Exception:
                 pass
         sys.exit(1)
