@@ -221,7 +221,7 @@ NVIDIA (NVDA)
 ---
 
 ## 12. 참고 사항
-- **FDR 안정성**: FinanceDataReader는 데이터 소스 변경으로 간헐적 장애가 발생할 수 있음. 2단계에서 yfinance fallback 검토
+- **FDR 안정성**: FDR NaN 대응 완료 — 재시도(2회) + yfinance fallback(US) + NaN 행 자동 제거
 - **데이터 시점**: KST 10:00 실행 시 한국 장은 개장 중이나, 조회 데이터는 전일 종가 기준. 미국 주식은 전일 장 마감(ET 16:00) 후 확정된 데이터 사용
 - **uv 로컬 개발**: `uv sync`로 의존성 설치, `uv run python -m src.main`으로 실행
 

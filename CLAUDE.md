@@ -55,7 +55,8 @@ main.run()
 ## 개발 현황
 
 - 1단계 MVP: 완료 (테스트 미작성)
-- 2단계 정보 확장: Embed/이모지/전일비/정렬 완료, 거래량/yfinance fallback 미구현
+- 2단계 정보 확장: Embed/이모지/전일비/정렬 완료, 거래량 미구현
+- 2단계 안정성: FDR 재시도 + yfinance fallback 완료
 - 2.5단계 인프라: Supabase pg_cron 트리거 완료
 - 3단계 고도화: 미착수 (Supabase 이력 저장, 웹 UI, 알림 임계값, 포트폴리오 뷰)
 
@@ -67,7 +68,7 @@ main.run()
 - Supabase pg_cron 관리 → `docs/supabase-cron.md`
 - 시크릿 위치 → `docs/secrets.md`
 - 종목 추가/변경 → `config/watchlist.yaml` (코드 수정 불필요)
-- 기술 스택: Python 3.11+, uv, FinanceDataReader, requests, PyYAML, python-dotenv
+- 기술 스택: Python 3.11+, uv, FinanceDataReader, yfinance, requests, PyYAML, python-dotenv
 
 ## 작업 규칙
 
