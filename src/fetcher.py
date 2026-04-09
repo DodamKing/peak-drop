@@ -1,5 +1,4 @@
 import math
-import time
 import logging
 from datetime import datetime, timedelta
 
@@ -9,40 +8,32 @@ logger = logging.getLogger(__name__)
 
 
 def _clean_df(df, end: datetime):
-    """오늘 날짜의 불완전 데이터 제거 + 중복/NaN 제거."""
+    """오늘 날짜의 불완전 데이터 제거 + 중복 제거."""
     if df is None or df.empty:
         return df
     today_str = end.strftime("%Y-%m-%d")
     df = df[df.index.strftime("%Y-%m-%d") < today_str]
     df = df[~df.index.duplicated(keep="last")]
-    df = df.dropna(subset=["Close"])
     return df
 
 
-def _is_valid(df) -> bool:
-    """DataFrame이 유효하고 마지막 Close가 NaN이 아닌지 확인."""
+def _has_nan_close(df) -> bool:
+    """마지막 행의 Close가 NaN인지 확인."""
     if df is None or df.empty:
-        return False
+        return True
     last_close = df["Close"].iloc[-1]
-    return not (math.isnan(last_close) if isinstance(last_close, float) else False)
+    return math.isnan(last_close) if isinstance(last_close, float) else False
 
 
-def _fetch_fdr_with_retry(symbol: str, start_str: str, end_str: str, end: datetime,
-                          max_retries: int = 2, delay: int = 5):
-    """FDR 조회, NaN이면 재시도. 실패 시 None 반환."""
-    for attempt in range(1 + max_retries):
-        if attempt > 0:
-            logger.warning(f"{symbol}: FDR 재시도 {attempt}/{max_retries} ({delay}초 대기)")
-            time.sleep(delay)
-
-        try:
-            df = fdr.DataReader(symbol, start_str, end_str)
-            df = _clean_df(df, end)
-            if _is_valid(df):
-                return df
-        except Exception as e:
-            logger.warning(f"{symbol}: FDR 조회 실패 — {e}")
-
+def _fetch_fdr(symbol: str, start_str: str, end_str: str, end: datetime):
+    """FDR 조회. 실패 시 None 반환."""
+    try:
+        df = fdr.DataReader(symbol, start_str, end_str)
+        df = _clean_df(df, end)
+        if not _has_nan_close(df):
+            return df
+    except Exception as e:
+        logger.warning(f"{symbol}: FDR 조회 실패 — {e}")
     return None
 
 
@@ -53,7 +44,7 @@ def _fetch_yfinance(symbol: str, start_str: str, end_str: str, end: datetime):
         ticker = yf.Ticker(symbol)
         df = ticker.history(start=start_str, end=end_str, auto_adjust=False)
         df = _clean_df(df, end)
-        if _is_valid(df):
+        if not _has_nan_close(df):
             return df
     except Exception as e:
         logger.warning(f"{symbol}: yfinance 조회 실패 — {e}")
@@ -61,12 +52,8 @@ def _fetch_yfinance(symbol: str, start_str: str, end_str: str, end: datetime):
 
 
 def _extract_prices(symbol: str, df) -> dict:
-    """DataFrame에서 가격 정보를 추출한다. NaN이면 에러 반환."""
+    """DataFrame에서 가격 정보를 추출한다."""
     current_price = round(float(df["Close"].iloc[-1]), 2)
-
-    if math.isnan(current_price):
-        return {"symbol": symbol, "error": "가격 데이터가 NaN입니다"}
-
     high_52w = round(float(df["Close"].max()), 2)
 
     if len(df) >= 2:
@@ -94,14 +81,14 @@ def fetch_stock_data(symbol: str, market: str) -> dict:
         start_str = start.strftime("%Y-%m-%d")
         end_str = end.strftime("%Y-%m-%d")
 
-        df = _fetch_fdr_with_retry(symbol, start_str, end_str, end)
+        df = _fetch_fdr(symbol, start_str, end_str, end)
 
         if df is None and market == "US":
             logger.warning(f"{symbol}: FDR 실패, yfinance fallback 시도")
             df = _fetch_yfinance(symbol, start_str, end_str, end)
 
-        if df is None or df.empty:
-            return {"symbol": symbol, "error": "데이터 조회 결과 없음"}
+        if df is None:
+            return {"symbol": symbol, "error": "데이터를 가져올 수 없습니다 (NaN 또는 조회 실패)"}
 
         return _extract_prices(symbol, df)
     except Exception as e:

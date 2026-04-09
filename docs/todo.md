@@ -47,5 +47,5 @@
 - [x] pg_cron 관리 SQL 문서화 (docs/supabase-cron.md)
 
 ### 안정성 개선 — 2026-04-09
-- [x] FDR NaN 대응: 재시도 + yfinance fallback + NaN 행 제거
+- [x] FDR NaN 대응: yfinance fallback + NaN 시 에러 처리
 - [x] yfinance 의존성 추가
