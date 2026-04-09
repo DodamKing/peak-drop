@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-04-09
+- FDR US 주식 NaN 데이터 대응: 재시도(2회) + yfinance fallback
+- yfinance 의존성 추가
+- fetcher.py 리팩토링: 헬퍼 분리 (_clean_df, _fetch_fdr_with_retry, _fetch_yfinance, _extract_prices)
+- NaN 행 자동 제거 (Close 컬럼 기준)
+- yfinance float32 정밀도 문제 해결 (가격 round 처리)
+
 ## 2026-04-01
 - GitHub Actions schedule 제거, Supabase pg_cron 전용 트리거로 전환
 - Supabase pg_cron 스케줄: KST 10:00 → KST 9:10 + 13:10 (2회/일)

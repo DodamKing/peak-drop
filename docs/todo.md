@@ -8,7 +8,6 @@
 
 ### 2단계 — 정보 확장
 - [ ] 거래량 정보 추가
-- [ ] yfinance fallback 검토 (FDR 장애 대비)
 
 ### 1단계 — 잔여
 - [ ] 테스트 작성 및 통과 확인
@@ -46,3 +45,7 @@
 - [x] Supabase pg_cron 스케줄 변경: KST 9:10 + 13:10 (2회/일)
 - [x] SCHD 종목 추가
 - [x] pg_cron 관리 SQL 문서화 (docs/supabase-cron.md)
+
+### 안정성 개선 — 2026-04-09
+- [x] FDR NaN 대응: 재시도 + yfinance fallback + NaN 행 제거
+- [x] yfinance 의존성 추가
