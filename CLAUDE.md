@@ -44,7 +44,8 @@ main.run()
 - **fetcher** 반환: `{symbol, current_price, prev_price, daily_change, high_52w, error}`
 - **analyzer** 반환: `{symbol, current_price, peak_price, drawdown, is_new_high, daily_change}`
 - **peak_type**: `auto_52w` (52주 최고가 자동) 또는 `manual` (수동 지정)
-- **drawdown 공식**: `(현재가 - 고점) / 고점 * 100`
+- **drawdown 공식**: `(현재가 - 고점) / 고점 * 100` (현재가 = 어제 종가)
+- **daily_change**: KR은 `(당일 시가 - 어제 종가) / 어제 종가` (장중 실행 대응), US는 `(어제 종가 - 그제 종가) / 그제 종가`
 
 ## 인프라
 
@@ -55,7 +56,7 @@ main.run()
 ## 개발 현황
 
 - 1단계 MVP: 완료 (테스트 미작성)
-- 2단계 정보 확장: Embed/이모지/전일비/정렬 완료, 거래량 미구현
+- 2단계 정보 확장: Embed/이모지/전일비/정렬 완료
 - 2단계 안정성: FDR 재시도 + yfinance fallback 완료
 - 2.5단계 인프라: Supabase pg_cron 트리거 완료
 - 3단계 고도화: 미착수 (Supabase 이력 저장, 웹 UI, 알림 임계값, 포트폴리오 뷰)

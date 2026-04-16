@@ -26,29 +26,43 @@ def _has_nan_close(df) -> bool:
 
 
 def _fetch_fdr(symbol: str, start_str: str, end_str: str, end: datetime):
-    """FDR 조회. 실패 시 None 반환."""
+    """FDR 조회. (raw, cleaned) 반환, 실패 시 (None, None)."""
     try:
-        df = fdr.DataReader(symbol, start_str, end_str)
-        df = _clean_df(df, end)
-        if not _has_nan_close(df):
-            return df
+        raw = fdr.DataReader(symbol, start_str, end_str)
+        cleaned = _clean_df(raw, end)
+        if not _has_nan_close(cleaned):
+            return raw, cleaned
     except Exception as e:
         logger.warning(f"{symbol}: FDR 조회 실패 — {e}")
-    return None
+    return None, None
 
 
 def _fetch_yfinance(symbol: str, start_str: str, end_str: str, end: datetime):
-    """yfinance fallback 조회. 실패 시 None 반환."""
+    """yfinance fallback 조회. (raw, cleaned) 반환, 실패 시 (None, None)."""
     try:
         import yfinance as yf
         ticker = yf.Ticker(symbol)
-        df = ticker.history(start=start_str, end=end_str, auto_adjust=False)
-        df = _clean_df(df, end)
-        if not _has_nan_close(df):
-            return df
+        raw = ticker.history(start=start_str, end=end_str, auto_adjust=False)
+        cleaned = _clean_df(raw, end)
+        if not _has_nan_close(cleaned):
+            return raw, cleaned
     except Exception as e:
         logger.warning(f"{symbol}: yfinance 조회 실패 — {e}")
-    return None
+    return None, None
+
+
+def _extract_today_open(raw, end: datetime) -> float | None:
+    """raw DF에서 당일 시가를 추출. 없거나 NaN이면 None."""
+    if raw is None or raw.empty:
+        return None
+    today_str = end.strftime("%Y-%m-%d")
+    today_rows = raw[raw.index.strftime("%Y-%m-%d") == today_str]
+    if today_rows.empty:
+        return None
+    open_price = today_rows["Open"].iloc[-1]
+    if isinstance(open_price, float) and math.isnan(open_price):
+        return None
+    return round(float(open_price), 2)
 
 
 def _extract_prices(symbol: str, df) -> dict:
@@ -81,15 +95,23 @@ def fetch_stock_data(symbol: str, market: str) -> dict:
         start_str = start.strftime("%Y-%m-%d")
         end_str = end.strftime("%Y-%m-%d")
 
-        df = _fetch_fdr(symbol, start_str, end_str, end)
+        raw, df = _fetch_fdr(symbol, start_str, end_str, end)
 
         if df is None and market == "US":
             logger.warning(f"{symbol}: FDR 실패, yfinance fallback 시도")
-            df = _fetch_yfinance(symbol, start_str, end_str, end)
+            raw, df = _fetch_yfinance(symbol, start_str, end_str, end)
 
         if df is None:
             return {"symbol": symbol, "error": "데이터를 가져올 수 없습니다 (NaN 또는 조회 실패)"}
 
-        return _extract_prices(symbol, df)
+        result = _extract_prices(symbol, df)
+
+        if market == "KR":
+            today_open = _extract_today_open(raw, end)
+            if today_open is not None:
+                current = result["current_price"]
+                result["daily_change"] = round((today_open - current) / current * 100, 2)
+
+        return result
     except Exception as e:
         return {"symbol": symbol, "error": str(e)}
