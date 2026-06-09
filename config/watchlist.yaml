@@ -19,6 +19,22 @@ symbols:
     name: Schwab US Dividend Equity
     market: US
     peak_type: auto_52w
+  - symbol: AAPL
+    name: Apple
+    market: US
+    peak_type: auto_52w
+  - symbol: "368590"
+    name: RISE 미국나스닥100
+    market: KR
+    peak_type: auto_52w
+  - symbol: "418660"
+    name: TIGER 미국나스닥100레버리지(합성)
+    market: KR
+    peak_type: auto_52w
+  - symbol: "458730"
+    name: TIGER 미국배당다우존스
+    market: KR
+    peak_type: auto_52w
 
 settings:
   report_title: "Peak-Drop Daily Report"
